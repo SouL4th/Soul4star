@@ -1,0 +1,289 @@
+Practical No 1
+Aim: Write programs to implement the following Substitution Cipher
+Techniques: Caesar Cipher Encryption and Decryption.
+# Caesar Cipher Encryption Function
+
+def encrypt(text, s):
+    result = ""
+
+    # Traverse through each character in the text
+    for i in range(len(text)):
+        char = text[i]
+
+        # Encrypt uppercase characters
+        if char.isupper():
+            result += chr((ord(char) + s - 65) % 26 + 65)
+
+        # Encrypt lowercase characters
+        else:
+            result += chr((ord(char) + s - 97) % 26 + 97)
+
+    return result
+
+# Check the above function
+text = "HarshMhatre"
+s = 3
+
+print("Text   :", text)
+print("Shift  :", s)
+print("Cipher :", encrypt(text, s))
+
+
+Q2
+Aim:Write programs to implement the following Substitution Cipher
+Techniques: Playfair Cipher, Vernam Cipher
+Playfair Cipher
+# Install library first (run once in terminal)
+# pip install pycipher
+
+from pycipher import Playfair
+import string
+
+# Proper Playfair key (No 'J', total 25 letters)
+key = "MONARCHYBDEFGIKLPQSTUVWXZ"
+
+# Create Playfair cipher object
+cipher = Playfair(key)
+
+# Original plaintext
+plaintext = "Hello World"
+print("PT:", plaintext)
+
+# Remove spaces & non-letters, convert to uppercase
+plaintext = "".join(
+    c for c in plaintext.upper()
+    if c in string.ascii_uppercase
+)
+
+# Encrypt the plaintext
+encrypted = cipher.encipher(plaintext)
+print("Encrypted:", encrypted)
+
+# Decrypt the ciphertext
+decrypted = cipher.decipher(encrypted)
+print("Decrypted:", decrypted)
+
+Vernam Cipher
+
+# Function to clean text (remove spaces, keep only letters, convert to uppercase)
+def clean(t):
+    return "".join(c for c in t.upper() if c.isalpha())
+
+
+# Vernam Cipher Encryption
+def vernam_encrypt(pt, key):
+    pt = clean(pt)
+    key = clean(key)
+
+    # Key length must match plaintext length
+    if len(pt) != len(key):
+        raise ValueError("Key length must equal plaintext length")
+
+    # Encryption process
+    return "".join(
+        chr((ord(p) + ord(k) - 130) % 26 + 65)
+        for p, k in zip(pt, key)
+    )
+
+
+# Vernam Cipher Decryption
+def vernam_decrypt(ct, key):
+    ct = clean(ct)
+    key = clean(key)
+
+    # Decryption process
+    return "".join(
+        chr((ord(c) - ord(k) + 26) % 26 + 65)
+        for c, k in zip(ct, key)
+    )
+
+
+# -------- Test --------
+pt = "HELLO"
+key = "XMCKL"
+
+ct = vernam_encrypt(pt, key)
+
+print("Plaintext :", pt)
+print("Key       :", key)
+print("Ciphertext:", ct)
+print("Decrypted :", vernam_decrypt(ct, key))
+
+Q3Aim:
+Write programs to implement the following Transposition Cipher
+Techniques. Rail Fence Cipher , Simple Columnar Technique.
+Rail Fence Cipher
+# Install library first (run once in terminal)
+# pip install pycipher
+
+from pycipher import Railfence
+
+# Input text and key
+text = "HELLO WORLD"
+key = 3
+
+# Create cipher object
+cipher = Railfence(key)
+
+# Encrypt the text
+encrypted_text = cipher.encipher(text)
+
+# Decrypt the text
+decrypted_text = cipher.decipher(encrypted_text)
+
+# Display results
+print("Original Text  :", text)
+print("Encrypted Text :", encrypted_text)
+print("Decrypted Text :", decrypted_text)
+
+Simple Columnar Transposition Cipher
+# Install library first (run once in terminal)
+# pip install pycipher
+
+from pycipher import ColTrans
+
+# Input plaintext
+plaintext = "WEAREDISCOVEREDFLEEATONCE"
+
+# Column order key
+key_list = [3, 1, 4, 2]
+
+# Convert key list to string format
+key = "".join(map(str, key_list))
+
+# Create cipher object
+cipher = ColTrans(key)
+
+# Encrypt plaintext
+encrypted_text = cipher.encipher(plaintext)
+
+# Decrypt ciphertext
+decrypted_text = cipher.decipher(encrypted_text)
+
+# Display results
+print("Original Text :", plaintext)
+print("Encrypted     :", encrypted_text)
+print("Decrypted     :", decrypted_text)
+
+
+Q4 Aim:Write program to encrypt and decrypt strings using.
+- DES Algorithm
+# Install library first (run once in terminal)
+# pip install pycryptodome
+
+from Crypto.Cipher import DES
+import base64
+
+
+# Padding function (DES requires multiples of 8 bytes)
+def pad(text):
+    return text + (8 - len(text) % 8) * ' '
+
+
+# Remove padding
+def unpad(text):
+    return text.rstrip()
+
+
+# DES Encryption
+def des_encrypt(text, key):
+    # Ensure key is exactly 8 bytes
+    key = key.ljust(8)[:8].encode()
+
+    # Create DES cipher (ECB mode)
+    cipher = DES.new(key, DES.MODE_ECB)
+
+    # Encrypt and encode using Base64
+    encrypted_text = cipher.encrypt(pad(text).encode())
+    return base64.b64encode(encrypted_text).decode()
+
+
+# DES Decryption
+def des_decrypt(ciphertext, key):
+    # Ensure key is exactly 8 bytes
+    key = key.ljust(8)[:8].encode()
+
+    # Create DES cipher
+    cipher = DES.new(key, DES.MODE_ECB)
+
+    # Decode Base64 and decrypt
+    decrypted_text = cipher.decrypt(
+        base64.b64decode(ciphertext)
+    ).decode()
+
+    return unpad(decrypted_text)
+
+
+# -------- Test --------
+text = "HELLO WORLD"
+key = "secret12"
+
+cipher = des_encrypt(text, key)
+plain = des_decrypt(cipher, key)
+
+print("\n--- DES Encryption & Decryption ---")
+print("Plaintext  :", text)
+print("Key        :", key)
+print("Ciphertext :", cipher)
+print("Decrypted  :", plain)
+
+Q5 Aim: Write program to encrypt and decrypt strings using
+AES Algorithm
+# Install library first (run once in terminal)
+# pip install pycryptodome
+
+from Crypto.Cipher import AES
+import base64
+
+
+# Padding function (AES requires multiples of 16 bytes)
+def pad(text):
+    return text + (16 - len(text) % 16) * ' '
+
+
+# Remove padding
+def unpad(text):
+    return text.rstrip()
+
+
+# AES Encryption
+def aes_encrypt(text, key):
+    # Ensure key is exactly 16 bytes
+    key = key.ljust(16)[:16].encode()
+
+    # Create AES cipher (ECB mode)
+    cipher = AES.new(key, AES.MODE_ECB)
+
+    # Encrypt and encode using Base64
+    encrypted_text = cipher.encrypt(pad(text).encode())
+    return base64.b64encode(encrypted_text).decode()
+
+
+# AES Decryption
+def aes_decrypt(ciphertext, key):
+    # Ensure key is exactly 16 bytes
+    key = key.ljust(16)[:16].encode()
+
+    # Create AES cipher
+    cipher = AES.new(key, AES.MODE_ECB)
+
+    # Decode Base64 and decrypt
+    decrypted_text = cipher.decrypt(
+        base64.b64decode(ciphertext)
+    ).decode()
+
+    return unpad(decrypted_text)
+
+
+# -------- Test --------
+text = "Pillai University"
+key = "mysecretkey123"
+
+cipher = aes_encrypt(text, key)
+plain = aes_decrypt(cipher, key)
+
+print("\n--- AES Encryption & Decryption ---")
+print("Plaintext  :", text)
+print("Key        :", key)
+print("Ciphertext :", cipher)
+print("Decrypted  :", plain)

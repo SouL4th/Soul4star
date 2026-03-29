@@ -1,0 +1,323 @@
+P1 -Write a program to implement the following substitution techniques
+
+def caesar(t, k):
+    res = ""
+    for c in t:
+        if c.isalpha():
+            s = 65 if c.isupper() else 97
+            res += chr((ord(c) - s + k) % 26 + s)
+        else:
+            res += c
+    return res
+
+t = input("Text: ")
+k = 3
+
+e = caesar(t, k)
+print("Enc:", e)
+print("Dec:", caesar(e, -k))
+
+-----------------------------------------------------------------------------------------------------
+
+P2 - Write programs to implement the following Substitution Cipher Techniques:
+
+import string
+
+def vernam(text, key):
+    if len(text) != len(key): raise ValueError("Key must match text length!")
+    return "".join(chr(ord(t) ^ ord(k)) for t,k in zip(text, key))
+
+def to_hex(text):
+    return " ".join(f"{ord(c):02X}" for c in text)
+
+pt = "".join(c for c in input("Plaintext: ") if c in string.printable)
+key = "".join(c for c in input("Key: ") if c in string.printable)
+
+if len(pt) != len(key):
+    print("Error: Key length must match plaintext length!")
+else:
+    enc = vernam(pt, key)
+    dec = vernam(enc, key)
+    print("Encrypted:", enc)
+    print("Encrypted (hex):", to_hex(enc))
+    print("Decrypted:", dec)
+
+-----------------------------------------------------------------------------------------------------
+
+P3 - Write a program to implement the following Transposition techniques.
+
+1.Rail Fence Cypher
+def encrypt(t, k):
+    r = [''] * k
+    i, d = 0, 1
+    for c in t:
+        r[i] += c
+        if i == 0: d = 1
+        elif i == k-1: d = -1
+        i += d
+    return ''.join(r)
+
+def decrypt(c, k):
+    r = [[] for _ in range(k)]
+    i, d = 0, 1
+
+    for _ in c:
+        r[i].append('*')
+        if i == 0: d = 1
+        elif i == k-1: d = -1
+        i += d
+
+    idx = 0
+    for x in r:
+        for j in range(len(x)):
+            x[j] = c[idx]; idx += 1
+
+    res, i, d = '', 0, 1
+    for _ in c:
+        res += r[i].pop(0)
+        if i == 0: d = 1
+        elif i == k-1: d = -1
+        i += d
+    return res
+
+# test
+t = "HELLO"
+k = 3
+e = encrypt(t, k)
+print("Enc:", e)
+print("Dec:", decrypt(e, k))
+
+2.Row Column Cypher
+import numpy as np
+
+def encrypt(text, rows, cols):
+    text = text.replace(" ", "").ljust(rows*cols, "X")
+    grid = np.array(list(text)).reshape(rows, cols)
+    return "".join("".join(grid[:, c]) for c in range(cols))
+
+def decrypt(cipher, rows, cols):
+    grid = np.array(list(cipher)).reshape(cols, rows).T
+    return "".join(grid.flatten())
+
+text = "HELLO WORLD"
+rows, cols = 3, 4
+
+enc = encrypt(text, rows, cols)
+dec = decrypt(enc, rows, cols)
+
+print("Encrypted:", enc)
+print("Decrypted:", dec)
+
+-----------------------------------------------------------------------------------------------------
+
+P4 - Write a program to encrypt and decrypt strings using DES Algorithm.
+
+
+!pip install pycryptodome
+
+from Crypto.Cipher import DES
+from Crypto.Util.Padding import pad, unpad
+
+key = b'12345678'   # 8-byte key
+
+cipher = DES.new(key, DES.MODE_ECB)
+
+text = "HELLO"
+enc = cipher.encrypt(pad(text.encode(), 8))
+print("Encrypted:", enc)
+
+dec = unpad(cipher.decrypt(enc), 8).decode()
+print("Decrypted:", dec)
+
+-----------------------------------------------------------------------------------------------------
+
+P5 - Write a program to encrypt and decrypt strings using AES Algorithm.
+
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+from Crypto.Random import get_random_bytes
+import base64
+key = get_random_bytes(32)
+print("AES Key:", base64.b64encode(key).decode())
+def encrypt(text):
+    cipher = AES.new(key, AES.MODE_CBC)
+    ct = cipher.encrypt(pad(text.encode(), AES.block_size))
+    return base64.b64encode(cipher.iv + ct).decode()
+
+def decrypt(enc):
+    raw = base64.b64decode(enc)
+    cipher = AES.new(key, AES.MODE_CBC, raw[:16])
+    return unpad(cipher.decrypt(raw[16:]), AES.block_size).decode()
+data = input("Enter text: ")
+enc = encrypt(data)
+dec = decrypt(enc)
+print("Encrypted:", enc)
+print("Decrypted:", dec)
+
+-----------------------------------------------------------------------------------------------------
+
+P6 - Write a program to implement an IDEA algorithm to perform encryption / decryption of a given string.
+
+def encrypt(text, k1, k2):
+    b = int.from_bytes(text.encode(), "big")
+    L, R = b >> 32, b & 0xFFFFFFFF
+    L = (L + k1) % 65536
+    R = (R * k2) % 65536
+    return (L << 32) | R
+
+def decrypt(c, k1, k2):
+    L, R = c >> 32, c & 0xFFFFFFFF
+    L = (L - k1) % 65536
+    R = (R * pow(k2, -1, 65536)) % 65536
+    return ((L << 32) | R).to_bytes(8, "big").decode()
+
+text = "ABCDEFGH"
+c = encrypt(text, 12345, 54321)
+print("Enc:", c)
+print("Dec:", decrypt(c, 12345, 54321))
+
+-----------------------------------------------------------------------------------------------------
+
+P7 - Write a program to implement the Diffie-Hellman Key Agreement algorithm to generate symmetric keys.
+
+p = int(input("\nEnter a prime number: "))
+g = int(input("\nEnter a generator number: "))
+a = int(input("\nEnter a private key of A: "))
+b = int(input("\nEnter a private key of B: "))
+A = pow(g,a,p)
+B = pow(g,b,p)
+print("\n\nComputed public key of A: ", A)
+print("\nComputed public key of B: ", B)
+sA = pow(B,a,p)
+sB = pow(A,b,p)
+print("\n\nSecret shared key of A: ", sA)
+print("\nSecret shared key of B: ", sB)
+if sA == sB:
+  print("\n\nThe shared key is established successfully!")
+else:
+  print("\n\nThe shared keys do not match!")
+
+-----------------------------------------------------------------------------------------------------
+
+P8 - Write a program to implement to MD5 algorithm to compute the message digest
+
+import hashlib
+
+message = "Hii I'm Ganesh"
+
+msg_bytes = message.encode()
+
+md5 = hashlib.md5()
+
+md5.update(msg_bytes)
+
+hash_value = md5.hexdigest()
+
+print("MD5 Digest:", hash_value)
+
+-----------------------------------------------------------------------------------------------------
+
+P9 - Write a program to calculate HMAC-SHA1 Signature
+
+import hmac, hashlib, base64
+
+key = "secret"
+msg = "hello"
+
+h = hmac.new(key.encode(), msg.encode(), hashlib.sha1)
+sig = base64.b64encode(h.digest()).decode()
+
+print("Signature:", sig)
+
+-----------------------------------------------------------------------------------------------------
+
+P10 - Write a Python program to illustrate ElGamal encryption
+
+import random
+
+p, g = 467, 2
+x = random.randint(1, p-2)   # private key
+h = pow(g, x, p)             # public key part
+
+def encrypt(m):
+    y = random.randint(1, p-2)
+    c1 = pow(g, y, p)
+    c2 = (m * pow(h, y, p)) % p
+    return c1, c2
+
+def decrypt(c1, c2):
+    s = pow(c1, x, p)
+    return (c2 * pow(s, -1, p)) % p
+
+m = 123
+c1, c2 = encrypt(m)
+print("Encrypted:", (c1, c2))
+print("Decrypted:", decrypt(c1, c2))
+
+
+
+def encrypt(t, k):
+    r = [''] * k
+    i, d = 0, 1
+    for c in t:
+        r[i] += c
+        if i == 0:
+            d = 1
+        elif i == k - 1:
+            d = -1
+        i += d
+    return ''.join(r)
+
+t = "HELLO"
+print("Enc:", encrypt(t, 3))
+
+-----------------------------------------------------------------------------------------------------
+
+# Playfair Cipher (short)
+
+def matrix(key):
+    k = ""
+    for c in key.upper().replace('J','I'):
+        if c not in k:
+            k += c
+    for c in "ABCDEFGHIKLMNOPQRSTUVWXYZ":
+        if c not in k:
+            k += c
+    return [k[i:i+5] for i in range(0,25,5)]
+
+def pos(m, ch):
+    for i in range(5):
+        for j in range(5):
+            if m[i][j] == ch:
+                return i, j
+
+def playfair(t, m):
+    t = t.upper().replace('J','I')
+    if len(t) % 2: t += 'X'
+    r = ""
+    for i in range(0, len(t), 2):
+        a, b = t[i], t[i+1]
+        r1,c1 = pos(m,a)
+        r2,c2 = pos(m,b)
+
+        if r1 == r2:
+            r += m[r1][(c1+1)%5] + m[r2][(c2+1)%5]
+        elif c1 == c2:
+            r += m[(r1+1)%5][c1] + m[(r2+1)%5][c2]
+        else:
+            r += m[r1][c2] + m[r2][c1]
+    return r
+
+# test
+m = matrix("KEY")
+print(playfair("HELLO", m))
+
+
+
+
+
+
+
+
+
+

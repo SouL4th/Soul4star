@@ -1,0 +1,153 @@
+Q6 Aim: Write a program to implement an IDEA algorithm to perform encryption /decryption of a given
+
+# Function to divide text into blocks of size n (default 8 bytes)
+def pad_blocks(s, n=8):
+    return [
+        s[i:i+n].ljust(n, '\0')
+        for i in range(0, len(s), n)
+    ]
+# XOR operation between block and key
+def xor_block(block, key):
+    return ''.join(
+        chr(ord(c) ^ ord(k))
+        for c, k in zip(block, key)
+    )
+# Encryption function
+def encrypt(text, key):
+    return ''.join(
+        xor_block(block, key[:8])
+        for block in pad_blocks(text)
+    )
+# Decryption function
+def decrypt(cipher, key):
+    return ''.join(
+        xor_block(block, key[:8])
+        for block in pad_blocks(cipher)
+    ).rstrip('\0')
+# -------- Example --------
+key = "12345678"
+plaintext = "Hello IDEA Algorithm"
+
+encrypted = encrypt(plaintext, key)
+
+print("Plaintext :", plaintext)
+
+# Display encrypted text in hex format
+print("Encrypted :", " ".join(
+    f"{ord(c):02x}" for c in encrypted
+))
+
+print("Decrypted :", decrypt(encrypted, key))
+-----------------------------------------------------------------------------------------------------------------
+Q7-Aim:Write a program to implement the Diffie Hellman Key Agreement algorithm to generate symmetric keys.
+
+import random
+
+# Step 1: Agree on public parameters
+# (In real applications, use very large prime numbers)
+p = 23   # Prime number
+g = 5    # Primitive root modulo p
+
+print(f"Public parameters: p = {p}, g = {g}")
+
+
+# Step 2: Each party selects a private key
+# Alice's private key
+a = random.randint(1, p - 2)
+
+# Bob's private key
+b = random.randint(1, p - 2)
+
+print(f"Alice's private key: {a}")
+print(f"Bob's private key: {b}")
+
+
+# Step 3: Compute public keys
+# Alice's public key
+A = pow(g, a, p)
+
+# Bob's public key
+B = pow(g, b, p)
+
+print(f"Alice's public key: {A}")
+print(f"Bob's public key: {B}")
+
+
+# Step 4: Exchange public keys and compute shared secret
+# Alice computes shared secret
+shared_secret_alice = pow(B, a, p)
+
+# Bob computes shared secret
+shared_secret_bob = pow(A, b, p)
+
+print(f"Alice's computed shared secret: {shared_secret_alice}")
+print(f"Bob's computed shared secret: {shared_secret_bob}")
+
+
+# Step 5: Verify both shared secrets are equal
+if shared_secret_alice == shared_secret_bob:
+    print(f"Symmetric key established: {shared_secret_alice}")
+else:
+    print("Error: shared secrets do not match!")
+------------------------------------------------------------------------------
+Q8 -Aim: Write a program to imple ment the MD5 algorithm to compute the message digest.
+import hashlib
+
+
+# Function to compute MD5 hash
+def compute_md5(message):
+    # Create MD5 object
+    md5_hash = hashlib.md5()
+
+    # Convert string to bytes and update hash
+    md5_hash.update(message.encode())
+
+    # Return hexadecimal digest
+    return md5_hash.hexdigest()
+
+
+# -------- Main Program --------
+text = input("Enter message: ")
+
+# Generate MD5 hash
+digest = compute_md5(text)
+
+# Display results
+print("\nMessage :", text)
+print("MD5 Digest :", digest)
+-----------------------------------------------------------------------
+Q9 -Aim: Write a program to calculate HMAC SHA1 Signature
+
+import hmac
+import hashlib
+
+
+# Function to calculate HMAC-SHA1
+def calculate_hmac_sha1(message, key):
+    hmac_obj = hmac.new(
+        key.encode(),
+        message.encode(),
+        hashlib.sha1
+    )
+    return hmac_obj.hexdigest()
+
+
+# -------- Main Program --------
+msg = input("Enter message: ")
+secret_key = input("Enter secret key: ")
+
+# Generate HMAC signature
+signature = calculate_hmac_sha1(msg, secret_key)
+
+# Display results
+print("\nMessage :", msg)
+print("Secret Key :", secret_key)
+print("HMAC-SHA1 Signature :", signature)
+---------------------------------------------------------------
+Q10 Aim: Write a Python program to illustrate ElGamal encryption
+
+
+
+
+
+
