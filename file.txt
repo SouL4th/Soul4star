@@ -1,0 +1,186 @@
+#Practical No. 10
+#Regression 
+y_on_x=lm(y~x)
+x_on_y=lm(x~y)
+predict(y_on_x,newdata=data.frame(x=17))
+predict(x_on_y,newdata=data.frame(y=10))
+
+#Sign Test
+x=c()
+M=50
+SP=length(x[x>M])
+SN=length(x[x<M])
+n=SN+SP
+pvalue=pbinom(SN,n,0.5)
+#pvalue>los--> Accept H0
+
+#Wilcoxon Signed Rank Test
+#H0:M=15, #H1: M>15
+x=c()
+wilcox.test(x, alter="greater",mu=15)
+
+
+bef=c()
+aft=c()
+d=bef-aft
+wilcox.test(d, alter="greater",mu=0)
+
+#Practical No 9
+#Correlation 
+x=c()
+y=c()
+r=cor(x,y)
+plot(x,y,main='Title',col='red',xlab='',ylab='')
+
+#Kruskal Wallis Test
+A=c()
+B=c()
+C=c()
+Kruskal.test(list(A,B,C))
+
+#Friedman Test
+df=data.frame(person=rep(1:5,each=4),
+              drug=rep(c(1,2,3,4),times=5)
+              score=c(30,40,50....))
+df
+friedman.test(y=df$person, df$drug, df$score)
+
+
+#Practical No 8
+grp1=c()
+grp2=c()
+grp3=c()
+size=c(grp1,grp2,grp3)
+size
+group=factor(rep(c("G1","G2","G3"),each=5))
+group
+df=data.frame(size,group)
+df
+model=aov(size~group)
+model
+install.packages("agricolae")
+library(agricolae)
+LSD.test(model,"group")
+TukeyHSD(model)
+
+
+#Practical No 7
+#Anova
+#H0:m1=m2=m3    H1:atleast teo differ from one
+drug=c(rep('A',9),rep('B',9),rep('C',9))
+pain=c()
+df=data.frame(pain,drug)
+df
+res=aov(pain~drug,data=df)
+res
+summary(res)
+
+#Excel File
+d=read.csv(file.choose())
+d
+Manure=d$manure
+Plots=d$plots
+boxplot(Manure~Plots,col='red')
+res=aov(Manure~Plots)
+s=summary(res)
+pval=s[[1]]$'Pr(>F)'[[1]]
+if(pavl>0.05){
+print("accept H0")}{else
+print("reject H0")}
+
+#Two way
+f=d$Fertilizer
+w=d$Wheat
+y=d$yeild
+boxplot(y~w,col='yellow')
+boxplot(y~f,col='blue')
+res=aov(y~w+f)
+res
+s=summary(res)
+pval=s[[1]]$'Pr(>F)'[[1]]
+if(pavl>0.05){
+print("accept H0")}{else
+print("reject H0")}
+
+
+#Practical No 6
+#F-test
+x=c()
+y=c()
+f=var.test(x,y)
+
+
+#Practical No 5
+x=c(...)
+chi.test=chisq.test(x,p=c(1/7...))
+chi.test
+
+a=matrix(x,nrow=,ncol=)
+a
+chi.test(a,correct=F)
+chi.test$expected
+chi.test$observed
+p=chi.test$p.value
+if(p>0.05){
+print("Accept")}else{
+print("Reject")
+}
+
+#Goodness of Fit
+o=c()
+pr=c(ratio)
+e=pr/sum of ratio
+chi=chisq.test(o,p=e)
+chi$expected
+chi$observed
+p=chi$p.value
+if(p>0.05){
+print("Accept")}else{
+print("Reject")
+}
+
+
+Practical No 1
+Small Sample Test
+s=sqrt((n1-1)*s1^2+(n1-1)*s2^2)/(n1+n2-2)
+a=1-0.95
+margin=qt(1-a/2,df=n1+n2-2)*s*sqrt((1/n1)+(1/n2))
+lowerlimit=(x1bar-x2bar)-margin
+Upperlimit=(x1bar-x2bar)+margin
+
+for large sample test
+margin=qnorm(1/a2)*sqrt((s1^2/n1)+(s2^2/n2))
+
+p and q
+x1,x2,n1,n2
+p=(x1+x2)/(n1+n2)
+q=1-p
+pq=p*q	
+a=1-0.99
+margin=qt(1-a/2)*sqrt(pq*(1/n1)+(1/n2))
+
+
+Practical No 2
+xbar=
+mu=
+n=
+s=
+zcal=(xbar-mu)/s*sqrt(n)
+zcal
+pval=2*(1-pnorm(abs(zcal)))
+pval
+if(pval>0.05) print("Accept") else print("Reject")
+
+
+Practical No 3
+xbar
+n
+sd
+a=1-0.99
+margin=(1-a/2,df=n1-1)*s/sqrt(n)
+lowerlimit=xbar-margin
+upperlimit=xbar+margin
+
+
+
+
